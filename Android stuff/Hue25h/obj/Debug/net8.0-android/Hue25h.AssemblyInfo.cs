@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Hue25h")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+9a0b6fa6d6a1a29cd3e93e082ea8272d85dd515d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+10d7a83c1d33037dac13ddbc201fca156f174301")]
 [assembly: System.Reflection.AssemblyProductAttribute("Hue25h")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Hue25h")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
