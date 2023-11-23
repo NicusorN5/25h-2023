@@ -1,0 +1,40 @@
+/* CoolPanel.css */
+
+.cool-panel {
+    position: fixed;
+    top: 0;
+    left: -300px; /* Adjust as needed */
+    width: 300px;
+    height: 100%;
+    background-color: #333;
+    color: #fff;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .cool-panel.open {
+    left: 0;
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+  
+  .panel {
+    padding: 20px;
+  }
+  
+  .close-button {
+    background-color: #555;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  

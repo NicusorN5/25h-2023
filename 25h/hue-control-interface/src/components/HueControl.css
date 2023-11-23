@@ -1,0 +1,45 @@
+/* CoolPanel.css */
+
+.cool-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  /* HueControl.css */
+  
+  .hue-title {
+    color: #ffffff; /* White text */
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    margin-bottom: 10px;
+  }
+  
+  .light-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  
+  button {
+    background-color: #01ff70; /* Green button */
+    color: #001f3f; /* Dark blue text */
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  

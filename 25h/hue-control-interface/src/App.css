@@ -1,0 +1,43 @@
+/* App.css */
+
+.app {
+  text-align: center;
+}
+
+.main-title {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 20px;
+}
+
+.light-info {
+  font-weight: bold;
+}
+
+.light-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+button {
+  margin-top: 10px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.brightness-control,
+.color-control {
+  margin-top: 10px;
+}
+
+/* Add more styles as needed */
