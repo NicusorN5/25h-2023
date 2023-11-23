@@ -78,22 +78,25 @@ const App = () => {
   };
 
   const connectAllLights = async () => {
-    const validLights = lights.filter((light) => light.id !== selectedLightId && light.id >= 12 && light.id <= 24);
+    const lightsToConnect = [13, 12, 16, 14, 15, 17]; // Add or modify the light IDs as needed
+  
     try {
       await Promise.all(
-        validLights.map(async (light) => {
+        lightsToConnect.map(async (lightId) => {
           await axios.put(
-            `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${light.id}/state`,
+            `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${lightId}/state`,
             { on: true }
           );
         })
       );
+  
       // Update the state after successfully connecting all lights
       fetchData();
     } catch (error) {
       console.error('Error connecting lights:', error);
     }
   };
+  
 
   const resetLights = async () => {
     try {
@@ -109,12 +112,13 @@ const App = () => {
   };
 
   const turnOffAllLights = async () => {
-    const validLights = lights.filter((light) => light.id >= 12 && light.id <= 24);
+    const lightsToTurnOff = [13, 12, 16, 14, 15, 17]; // Add or modify the light IDs as needed
+  
     try {
       await Promise.all(
-        validLights.map(async (light) => {
+        lightsToTurnOff.map(async (lightId) => {
           await axios.put(
-            `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${light.id}/state`,
+            `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${lightId}/state`,
             { on: false }
           );
         })
@@ -125,7 +129,7 @@ const App = () => {
       console.error('Error turning off lights:', error);
     }
   };
-
+  
   return (
     <div className="app">
       <h1 className='text-start main-title'>Welcome!</h1>
