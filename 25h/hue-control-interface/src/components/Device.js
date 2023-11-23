@@ -4,7 +4,7 @@ import axios from 'axios';
 export default function Device(props) {
 
     return (
-        <div className="App">
+        <div className="App card-horizontal">
         <button type="button" className="btn btn-primary">
            Play
         </button>

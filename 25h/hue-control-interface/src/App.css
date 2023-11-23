@@ -6,7 +6,10 @@
 
 .main-title {
   margin-bottom: 20px;
-  font-size: 24px;
+  font-size: 32px;
+  font-weight: bold;
+  margin: 40px;
+  margin-top: 64px;
   color: #333;
 }
 

@@ -7,7 +7,7 @@ import Device from "./components/Device.js";
 
 const App = () => {
   const [lights, setLights] = useState([]);
-  const [selectedLightId, setSelectedLightId] = useState(13);
+  const [selectedLightId, setSelectedLightId] = useState(16);
 
   useEffect(() => {
     fetchData();
@@ -128,7 +128,7 @@ const App = () => {
 
   return (
     <div className="app">
-      <h1 className="main-title">Philips Hue Control Interface</h1>
+      <h1 className='text-start main-title'>Welcome!</h1>
       <Device />
       <div className="light-settings">
         <div className="light-selector">
