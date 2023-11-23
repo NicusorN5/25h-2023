@@ -9,6 +9,10 @@
     border-radius: 25px;
     transition: all 0.3s;
     font-family: "Fira Sans", sans-serif;
+    width: 480px;
+    height: 270px;
+    object-fit: cover;
+    border-radius: 20px;
   }
   
   input[type="range"] {
