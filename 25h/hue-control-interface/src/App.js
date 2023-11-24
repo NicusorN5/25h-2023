@@ -118,33 +118,25 @@ const App = () => {
     }
   };
 
-  const resetLight = async () => {
-    try {
-      // Reset the state of the selected light
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { on: false }
-      );
-      fetchData();
-      setIsAllLightsConnected(false);
-    } catch (error) {
-      console.error('Error resetting light:', error);
-    }
-  };
+const resetLight = async () => {
+  try {
+    await axios.put(`${API_BASE_URL}/${selectedLightId}/state`, { on: false });
+    fetchData();
+    setIsAllLightsConnected(false);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-  const startLight = async () => {
-    try {
-      // Turn on the selected light
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { on: true }
-      );
-      fetchData();
-      setIsAllLightsConnected(true);
-    } catch (error) {
-      console.error('Error starting light:', error);
-    }
-  };
+const startLight = async () => {
+  try {
+    await axios.put(`${API_BASE_URL}/${selectedLightId}/state`, { on: true });
+    fetchData();
+    setIsAllLightsConnected(true);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const handleEmergencyAlert = async (color) => {
     try {
@@ -286,6 +278,9 @@ const App = () => {
         </div>
        
         <div className="card">
+        <button onClick={() => handleEmergencyAlert('red')} className="button">
+            Emergency Alert (Red)
+          </button>
           <button onClick={resetLight} className="button">
             Reset Light
           </button>
@@ -296,11 +291,6 @@ const App = () => {
             </button>
           <button onClick={startLight} className="button">
             Start Light
-          </button>
-        </div>
-        <div className="card">
-          <button onClick={() => handleEmergencyAlert('red')} className="button">
-            Emergency Alert (Red)
           </button>
         </div>
       </div>
