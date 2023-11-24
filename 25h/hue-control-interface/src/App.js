@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCarBattery } from '@fortawesome/free-solid-svg-icons';
 import './App.css';
 
+
 const App = () => {
   const [lights, setLights] = useState([]);
   const [selectedLightId, setSelectedLightId] = useState(16);
@@ -86,6 +87,11 @@ const App = () => {
     } catch (error) {
       console.error('Error changing color:', error);
     }
+  };
+   const [showSyncButton, setShowSyncButton] = useState(false);
+
+  const handleShowSyncButton = () => {
+    setShowSyncButton(true);
   };
 
   const randomColor = async () => {
@@ -221,7 +227,9 @@ const App = () => {
   };
 
   return (
+    
     <div className="app">
+      
       <div className="navbar">
         <h1 className="text-start main-title">
           Welcome! <FontAwesomeIcon icon={faCarBattery} />
@@ -327,6 +335,7 @@ const App = () => {
         <div className="card">
           <button onClick={() => emergencyAlert('red')} className="button">
             Emergency Alert (Red)
+            
           </button>
         </div>
         
