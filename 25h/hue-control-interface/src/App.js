@@ -19,12 +19,13 @@ const App = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedLightId]); // Fetch data whenever the selected light ID changes
+
 
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        'http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights'
+        'http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights'
       );
       setLights(Object.values(response.data));
       const selectedLight = response.data[selectedLightId];
@@ -42,30 +43,65 @@ const App = () => {
     }
   };
 
+
   const toggleLight = async () => {
     try {
       if (!isLightOn) {
+        // Turn on the light
         await axios.put(
-          `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
-          { on: true, xy: [0.313, 0.329], ct: 366 }
+          `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
+          { on: true, transitiontime: 0 }
         );
       } else {
+        // Turn off the light with a transition time of 0 (instantly)
         await axios.put(
-          `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
-          { on: false }
+          `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
+          { on: false, transitiontime: 0 }
         );
       }
+      const response = await axios.get(
+        'http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights'
+      );
+      console.log('Response after toggling light:', response.data);
       fetchData();
     } catch (error) {
       console.error('Error toggling light:', error);
     }
   };
+  
+  const resetLight = async () => {
+    try {
+      // Reset the state of the selected light
+      await axios.put(
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
+        { on: false }
+      );
+      fetchData();
+      setIsAllLightsConnected(false);
+    } catch (error) {
+      console.error('Error resetting light:', error);
+    }
+  };
 
+  
+  const startLight = async () => {
+    try {
+      // Turn on the selected light
+      await axios.put(
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
+        { on: true }
+      );
+      fetchData();
+      setIsAllLightsConnected(true);
+    } catch (error) {
+      console.error('Error starting light:', error);
+    }
+  };
   const changeBrightness = async () => {
     try {
       const calculatedBrightness = Math.round((brightness / 100) * 254);
       await axios.put(
-        `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
         { bri: calculatedBrightness }
       );
       fetchData();
@@ -79,7 +115,7 @@ const App = () => {
     try {
       const calculatedColor = Math.round((color / 100) * 65535);
       await axios.put(
-        `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
         { hue: calculatedColor }
       );
       fetchData();
@@ -98,7 +134,7 @@ const App = () => {
     try {
       const calculatedColor = Math.floor(Math.random() * 65536);
       await axios.put(
-        `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
         { hue: calculatedColor, sat: 255 }
       );
       fetchData();
@@ -115,7 +151,7 @@ const App = () => {
       await Promise.all(
         lightsToConnect.map(async (lightId) => {
           await axios.put(
-            `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${lightId}/state`,
+            `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${lightId}/state`,
             { on: true }
           );
         })
@@ -134,7 +170,7 @@ const App = () => {
       await Promise.all(
         lightsToDisconnect.map(async (lightId) => {
           await axios.put(
-            `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${lightId}/state`,
+            `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${lightId}/state`,
             { on: false }
           );
         })
@@ -150,7 +186,7 @@ const App = () => {
     try {
       const calculatedTemperature = Math.round((temperature / 100) * 500);
       await axios.put(
-        `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
         { ct: calculatedTemperature }
       );
       fetchData();
@@ -163,7 +199,7 @@ const App = () => {
   const changeSaturation = async () => {
     try {
       await axios.put(
-        `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
         { sat: saturation }
       );
       fetchData();
@@ -176,7 +212,7 @@ const App = () => {
   const colorCycle = async () => {
     try {
       await axios.put(
-        `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
         { effect: 'colorloop' }
       );
     } catch (error) {
@@ -188,7 +224,7 @@ const App = () => {
     try {
       const calculatedColor = color === 'green' ? 25500 : 0;
       await axios.put(
-        `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
         { on: true, ct: calculatedColor }
       );
     } catch (error) {
@@ -217,7 +253,7 @@ const App = () => {
   const openLight = async () => {
     try {
       await axios.put(
-        `http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights/${selectedLightId}/state`,
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
         { on: true }
       );
       fetchData();
@@ -327,14 +363,20 @@ const App = () => {
             Color Cycle
           </button>
         </div>
+       
         <div className="card">
-          <button onClick={() => emergencyAlert('green')} className="button">
-            Emergency Alert (Green)
+          <button onClick={resetLight} className="button">
+            Reset Light
+          </button>
+        </div>
+        <div className="card">
+          <button onClick={startLight} className="button">
+            Start Light
           </button>
         </div>
         <div className="card">
           <button onClick={() => emergencyAlert('red')} className="button">
-            Emergency Alert (Red)
+            Emergency Alert ()
             
           </button>
         </div>
