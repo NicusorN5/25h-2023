@@ -118,6 +118,34 @@ const App = () => {
     }
   };
 
+  const resetLight = async () => {
+    try {
+      // Reset the state of the selected light
+      await axios.put(
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
+        { on: false }
+      );
+      fetchData();
+      setIsAllLightsConnected(false);
+    } catch (error) {
+      console.error('Error resetting light:', error);
+    }
+  };
+
+  const startLight = async () => {
+    try {
+      // Turn on the selected light
+      await axios.put(
+        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
+        { on: true }
+      );
+      fetchData();
+      setIsAllLightsConnected(true);
+    } catch (error) {
+      console.error('Error starting light:', error);
+    }
+  };
+
   const handleEmergencyAlert = async (color) => {
     try {
       const calculatedColor = color === 'green' ? 25500 : 0;
@@ -265,6 +293,7 @@ const App = () => {
         <div className="card">
           <button onClick={() => handleEmergencyAlert('green')} className="button">
             Emergency Alert (Green)
+            </button>
           <button onClick={startLight} className="button">
             Start Light
           </button>
