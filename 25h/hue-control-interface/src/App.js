@@ -1,11 +1,11 @@
-// App.js
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCarBattery } from '@fortawesome/free-solid-svg-icons';
 import './App.css';
 
+const API_BASE_URL =
+  'http://192.168.0.10/api/nT3-GptvjYpdzarNevlY993gwFakZTOzwZuvifYp/lights';
 
 const App = () => {
   const [lights, setLights] = useState([]);
@@ -16,256 +16,146 @@ const App = () => {
   const [color, setColor] = useState(50);
   const [saturation, setSaturation] = useState(50);
   const [temperature, setTemperature] = useState(50);
+  const [isColorCycling, setIsColorCycling] = useState(false);
 
   useEffect(() => {
     fetchData();
-  }, [selectedLightId]); // Fetch data whenever the selected light ID changes
-
+  }, [selectedLightId]);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        'http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights'
-      );
-      setLights(Object.values(response.data));
-      const selectedLight = response.data[selectedLightId];
-      setIsLightOn(selectedLight?.state?.on || false);
-      setBrightness(selectedLight?.state?.bri || 50);
-      setColor(
-        selectedLight?.state?.hue ? Math.round((selectedLight.state.hue / 65535) * 100) : 50
-      );
-      setSaturation(selectedLight?.state?.sat || 50);
-      setTemperature(
-        selectedLight?.state?.ct ? Math.round((selectedLight.state.ct / 500) * 100) : 50
-      );
+      const response = await axios.get(API_BASE_URL);
+      const lightsData = Object.values(response.data);
+      setLights(lightsData);
+
+      const selectedLight = lightsData.find((light) => light.id === selectedLightId);
+      if (selectedLight) {
+        setIsLightOn(selectedLight.state?.on || false);
+        setBrightness(selectedLight.state?.bri || 50);
+        setColor(
+          selectedLight.state?.hue
+            ? Math.round((selectedLight.state.hue / 65535) * 100)
+            : 50
+        );
+        setSaturation(selectedLight.state?.sat || 50);
+        setTemperature(
+          selectedLight.state?.ct ? Math.round((selectedLight.state.ct / 500) * 100) : 50
+        );
+      }
     } catch (error) {
       console.error('Error fetching lights:', error);
     }
   };
 
 
-  const toggleLight = async () => {
-    try {
-      if (!isLightOn) {
-        // Turn on the light
-        await axios.put(
-          `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-          { on: true, transitiontime: 0 }
-        );
-      } else {
-        // Turn off the light with a transition time of 0 (instantly)
-        await axios.put(
-          `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-          { on: false, transitiontime: 0 }
-        );
-      }
-      const response = await axios.get(
-        'http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights'
-      );
-      console.log('Response after toggling light:', response.data);
-      fetchData();
-    } catch (error) {
-      console.error('Error toggling light:', error);
-    }
-  };
+  const toggleLight = () => {
+    let newState;
   
-  const resetLight = async () => {
-    try {
-      // Reset the state of the selected light
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { on: false }
-      );
-      fetchData();
-      setIsAllLightsConnected(false);
-    } catch (error) {
-      console.error('Error resetting light:', error);
+    // Se la luce è accesa, spegnila; altrimenti, accendila con le impostazioni desiderate
+    if (isLightOn) {
+      newState = { on: false };
+    } else {
+      newState = { on: true, xy: [0.313, 0.329], ct: 366 };
     }
-  };
+  
+    axios
+      .put(`${API_BASE_URL}/${selectedLightId}/state`, newState)
+      .then(() => {
+        fetchData();
+        setIsLightOn(!isLightOn);
+      })
+      .catch((error) => {
+        console.error('Error toggling light:', error);
+      });
+  };  
 
-  
-  const startLight = async () => {
+  const changeState = async (state) => {
     try {
-      // Turn on the selected light
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { on: true }
-      );
-      fetchData();
-      setIsAllLightsConnected(true);
-    } catch (error) {
-      console.error('Error starting light:', error);
-    }
-  };
-  const changeBrightness = async () => {
-    try {
-      const calculatedBrightness = Math.round((brightness / 100) * 254);
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { bri: calculatedBrightness }
-      );
+      await axios.put(`${API_BASE_URL}/${selectedLightId}/state`, state);
       fetchData();
       openLight();
     } catch (error) {
-      console.error('Error changing brightness:', error);
+      console.error(`Error changing state: ${JSON.stringify(state)}`, error);
     }
   };
 
-  const changeColor = async () => {
-    try {
-      const calculatedColor = Math.round((color / 100) * 65535);
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { hue: calculatedColor }
-      );
-      fetchData();
-      openLight();
-    } catch (error) {
-      console.error('Error changing color:', error);
-    }
-  };
-   const [showSyncButton, setShowSyncButton] = useState(false);
-
-  const handleShowSyncButton = () => {
-    setShowSyncButton(true);
-  };
+  const changeBrightness = () => changeState({ bri: Math.round((brightness / 100) * 254) });
+  const changeColor = () => changeState({ hue: Math.round((color / 100) * 65535) });
+  const changeTemperature = () => changeState({ ct: Math.round((temperature / 100) * 500) });
+  const changeSaturation = () => changeState({ sat: saturation });
 
   const randomColor = async () => {
-    try {
-      const calculatedColor = Math.floor(Math.random() * 65536);
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { hue: calculatedColor, sat: 255 }
-      );
-      fetchData();
-      openLight();
-    } catch (error) {
-      console.error('Error changing color:', error);
-    }
+    const calculatedColor = Math.floor(Math.random() * 65536);
+    await changeState({ hue: calculatedColor, sat: 255 });
   };
 
-  const connectAllLights = async () => {
-    const lightsToConnect = [13, 12, 16, 14, 15, 17];
-
+  const handleConnectDisconnectAllLights = async (lightsArray, isConnected) => {
     try {
       await Promise.all(
-        lightsToConnect.map(async (lightId) => {
-          await axios.put(
-            `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${lightId}/state`,
-            { on: true }
-          );
+        lightsArray.map(async (lightId) => {
+          await axios.put(`${API_BASE_URL}/${lightId}/state`, { on: isConnected });
         })
       );
       fetchData();
-      setIsAllLightsConnected(true);
+      setIsAllLightsConnected(isConnected);
     } catch (error) {
-      console.error('Error connecting lights:', error);
+      console.error(`Error ${isConnected ? 'connecting' : 'disconnecting'} lights:`, error);
     }
   };
 
-  const disconnectAllLights = async () => {
-    const lightsToDisconnect = [13, 12, 16, 14, 15, 17];
+  const connectAllLights = () =>
+    handleConnectDisconnectAllLights([13, 12, 16, 14, 15, 17], true);
+  const disconnectAllLights = () =>
+    handleConnectDisconnectAllLights([13, 12, 16, 14, 15, 17], false);
 
+  const toggleColorCycle = async () => {
     try {
-      await Promise.all(
-        lightsToDisconnect.map(async (lightId) => {
-          await axios.put(
-            `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${lightId}/state`,
-            { on: false }
-          );
-        })
-      );
-      fetchData();
-      setIsAllLightsConnected(false);
+      const effect = isColorCycling ? 'none' : 'colorloop';
+      await changeState({ effect });
+      setIsColorCycling(!isColorCycling);
     } catch (error) {
-      console.error('Error disconnecting lights:', error);
+      console.error('Error toggling color cycle:', error);
     }
   };
 
-  const changeTemperature = async () => {
-    try {
-      const calculatedTemperature = Math.round((temperature / 100) * 500);
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { ct: calculatedTemperature }
-      );
-      fetchData();
-      openLight();
-    } catch (error) {
-      console.error('Error changing temperature:', error);
-    }
-  };
-
-  const changeSaturation = async () => {
-    try {
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { sat: saturation }
-      );
-      fetchData();
-      openLight();
-    } catch (error) {
-      console.error('Error changing saturation:', error);
-    }
-  };
-
-  const colorCycle = async () => {
-    try {
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { effect: 'colorloop' }
-      );
-    } catch (error) {
-      console.error('Error starting color cycle:', error);
-    }
-  };
-
-  const emergencyAlert = async (color) => {
+  const handleEmergencyAlert = async (color) => {
     try {
       const calculatedColor = color === 'green' ? 25500 : 0;
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { on: true, ct: calculatedColor }
-      );
+      await changeState({ on: true, ct: calculatedColor });
     } catch (error) {
       console.error('Error setting emergency alert:', error);
     }
-  };
+  };  
 
   const handleRangeChange = (slider, value) => {
-    if (slider === 'brightness') {
-      setBrightness(value);
-      changeBrightness();
-    } else if (slider === 'color') {
-      setColor(value);
-      changeColor();
-    } else if (slider === 'saturation') {
-      setSaturation(value);
-      changeSaturation();
-    } else if (slider === 'temperature') {
-      setTemperature(value);
-      changeTemperature();
+    switch (slider) {
+      case 'brightness':
+        setBrightness(value);
+        changeBrightness();
+        break;
+      case 'color':
+        setColor(value);
+        changeColor();
+        break;
+      case 'saturation':
+        setSaturation(value);
+        changeSaturation();
+        break;
+      case 'temperature':
+        setTemperature(value);
+        changeTemperature();
+        break;
+      default:
+        break;
     }
 
     openLight();
   };
 
-  const openLight = async () => {
-    try {
-      await axios.put(
-        `http://192.168.0.10/api/mkcAIPfWD0nY9nkmtErPzfwHT05SNHGffOurCf1E/lights/${selectedLightId}/state`,
-        { on: true }
-      );
-      fetchData();
-    } catch (error) {
-      console.error('Error opening light:', error);
-    }
-  };
+  const openLight = () => changeState({ on: true });
 
   return (
-    
     <div className="app">
-      
       <div className="navbar">
         <h1 className="text-start main-title">
           Welcome! <FontAwesomeIcon icon={faCarBattery} />
@@ -273,7 +163,10 @@ const App = () => {
       </div>
       <div className="menu">
         <div className="card">
-          <button onClick={toggleLight} className={`button ${isLightOn ? 'on' : 'off'}`}>
+          <button
+            onClick={toggleLight}
+            className={`button ${isLightOn ? 'on' : 'off'}`}
+          >
             {isLightOn ? 'Turn Off' : 'Turn On'}
           </button>
         </div>
@@ -359,8 +252,8 @@ const App = () => {
           </button>
         </div>
         <div className="card">
-          <button onClick={colorCycle} className="button">
-            Color Cycle
+          <button onClick={toggleColorCycle} className="button">
+            {isColorCycling ? 'Stop Color Cycle' : 'Start Color Cycle'}
           </button>
         </div>
        
@@ -370,17 +263,17 @@ const App = () => {
           </button>
         </div>
         <div className="card">
+          <button onClick={() => handleEmergencyAlert('green')} className="button">
+            Emergency Alert (Green)
           <button onClick={startLight} className="button">
             Start Light
           </button>
         </div>
         <div className="card">
-          <button onClick={() => emergencyAlert('red')} className="button">
-            Emergency Alert ()
-            
+          <button onClick={() => handleEmergencyAlert('red')} className="button">
+            Emergency Alert (Red)
           </button>
         </div>
-        
       </div>
     </div>
   );
