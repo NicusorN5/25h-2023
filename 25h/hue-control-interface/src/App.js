@@ -175,7 +175,7 @@ const startLight = async () => {
   const openLight = () => changeState({ on: true });
 
   return (
-    <div className="app">
+    <div className="app background">
       <div className="navbar">
         <h1 className="text-start main-title">
           Welcome! <FontAwesomeIcon icon={faCarBattery} />
@@ -212,6 +212,7 @@ const startLight = async () => {
             min="0"
             max="100"
             value={brightness}
+            class="slider"
             onChange={(e) => handleRangeChange('brightness', e.target.value)}
           />
         </div>
@@ -229,6 +230,7 @@ const startLight = async () => {
             min="0"
             max="100"
             value={color}
+            class="slider"
             onChange={(e) => handleRangeChange('color', e.target.value)}
           />
         </div>
@@ -246,6 +248,7 @@ const startLight = async () => {
             min="0"
             max="100"
             value={saturation}
+            class="slider"
             onChange={(e) => handleRangeChange('saturation', e.target.value)}
           />
         </div>
@@ -263,6 +266,7 @@ const startLight = async () => {
             min="0"
             max="100"
             value={temperature}
+            class="slider"
             onChange={(e) => handleRangeChange('temperature', e.target.value)}
           />
         </div>
